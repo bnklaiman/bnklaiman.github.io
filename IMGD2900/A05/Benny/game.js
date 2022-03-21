@@ -10,7 +10,7 @@ Last revision: 2022-03-15 (BM)
 // Mod 1: Changed grid size to 17x17
 // Mod 2: Changed click color from black to random
 // Mod 3: On click, fills screen with a horizontal bidirectional wipe starting from where a bead was clicked
-// Mod 4: Add a code-specified chance of playing a certain sound effect
+// Mod 4: Added a non-zero chance of playing a certain sound effect
 // Mod 5: Changed border and grid colors to change as grid is clicked
 
 "use strict"; // Do NOT remove this directive!
@@ -97,9 +97,9 @@ PS.touch = function(x, y, data, options) {
 
 	// Determine which sfx to play
 	var audioChance = PS.random(100);
-	if (audioChance === 69) {
-		PS.audioPlay("fx_wilhelm");
-	} else {
+	if (audioChance !== 69) {
 		PS.audioPlay("fx_zurp");
+	} else {
+		PS.audioPlay("fx_wilhelm");
 	}
 };

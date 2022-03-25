@@ -38,7 +38,7 @@ If you don't use JSHint (or are using it with a configuration file), you can saf
 
 "use strict"; // Do NOT remove this directive!
 
-// HSV to RGB conversion for firework colors, because apparently it's only RGB for P3, you see
+// HSV to RGB conversion for firework colors, because apparently it's only RGB for PS3, you see
 // adapted to JS using the formula at https://www.rapidtables.com/convert/color/hsv-to-rgb.html
 // returns array in the format: [r, g, b]
 function HSV2RGB(H, S, V) {

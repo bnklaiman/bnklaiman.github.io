@@ -215,8 +215,11 @@ PS.touch = function(x, y, data, options) {
 		G.activeFireworks.push({xPos: x, yPos: y});
 		PS.color(x, y, G.FIREWORK_UPWARD_COLOR);
 		PS.audioPlay("fx_jump3", { volume: 0.3 });
+		PS.statusText("Touch any bead.")
 	} else {
 		// if boundary line or higher clicked, explode on boundary line at x position immediately
+		// in case of an in-class demo
+		PS.statusText("That's not how fireworks work but okay");
 		G.explode(x, G.BOUNDARY_LINE);
 	}
 };

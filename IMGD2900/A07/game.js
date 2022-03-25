@@ -141,7 +141,36 @@ var G = {
 
 	// cause firework explosion from (x,y) location
 	explode: function(x, y) {
+		PS.audioPlay("fx_shoot7", { volume: 1.0 });
+		
+		// explosion effect
 		PS.color(x, y, G.FIREWORK_INITIAL_EXPLODE_COLOR);
+		PS.color(x, y+2, G.FIREWORK_INITIAL_EXPLODE_COLOR);
+		PS.color(x, y-2, G.FIREWORK_INITIAL_EXPLODE_COLOR);
+		PS.color(x, y+2, G.GRID_COLOR);
+		PS.color(x, y-2, G.GRID_COLOR);
+		if (x > 0) {
+			PS.color(x-1, y+1, G.FIREWORK_INITIAL_EXPLODE_COLOR);
+			PS.color(x-1, y-1, G.FIREWORK_INITIAL_EXPLODE_COLOR);
+			PS.color(x-1, y+1, G.GRID_COLOR);
+			PS.color(x-1, y-1, G.GRID_COLOR);
+		}
+		if (x > 1) {
+			PS.color(x-2, y, G.FIREWORK_INITIAL_EXPLODE_COLOR);
+			PS.color(x-2, y, G.GRID_COLOR);
+		}
+		if (x < G.GRID_WIDTH - 1) {
+			PS.color(x+1, y+1, G.FIREWORK_INITIAL_EXPLODE_COLOR);
+			PS.color(x+1, y-1, G.FIREWORK_INITIAL_EXPLODE_COLOR);
+			PS.color(x+1, y+1, G.GRID_COLOR);
+			PS.color(x+1, y-1, G.GRID_COLOR);
+		}
+		if (x < G.GRID_WIDTH - 2) {
+			PS.color(x+2, y, G.FIREWORK_INITIAL_EXPLODE_COLOR);
+			PS.color(x+2, y, G.GRID_COLOR);
+		}
+		
+		// clean up
 		PS.color(x, y, G.GRID_COLOR);
 	}
 };
@@ -162,10 +191,12 @@ PS.init = function(system, options) {
 	PS.statusText("Touch any bead.");
 	PS.border(PS.ALL, PS.ALL, 1);
 	PS.borderColor(PS.ALL, PS.ALL, 0x111111);
-	PS.fade(PS.ALL, PS.ALL, 15);
+	PS.fade(PS.ALL, PS.ALL, 10);
 	PS.gridColor(G.GRID_COLOR);
 	PS.color(PS.ALL, PS.ALL, G.GRID_COLOR);
 	PS.timerStart(2, G.tick);
+	PS.audioLoad("fx_jump3");
+	PS.audioLoad("fx_shoot7");
 };
 
 /*
@@ -183,6 +214,7 @@ PS.touch = function(x, y, data, options) {
 		// Position clicked is below boundary line, start ascent upwards from position clicked
 		G.activeFireworks.push({xPos: x, yPos: y});
 		PS.color(x, y, G.FIREWORK_UPWARD_COLOR);
+		PS.audioPlay("fx_jump3", { volume: 0.3 });
 	} else {
 		// if boundary line or higher clicked, explode on boundary line at x position immediately
 		G.explode(x, G.BOUNDARY_LINE);

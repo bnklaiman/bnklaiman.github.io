@@ -19,6 +19,9 @@ GNU Lesser General Public License for more details.
 
 You may have received a copy of the GNU Lesser General Public License
 along with the Perlenspiel devkit. If not, see <http://www.gnu.org/licenses/>.
+
+This toy uses modifications of "Firework - Take off - Small pop.wav" from user 
+Quistard on freesound.com and "Fireworks" from user MrAuralization on freesound.com
 */
 
 /*
@@ -143,6 +146,7 @@ var G = {
 	explode: function(x, y) {
 		PS.audioPlay("fx_shoot7", { volume: 1.0 });
 		
+
 		// explosion effect
 		PS.color(x, y, G.FIREWORK_INITIAL_EXPLODE_COLOR);
 		PS.color(x, y+2, G.FIREWORK_INITIAL_EXPLODE_COLOR);
@@ -197,6 +201,8 @@ PS.init = function(system, options) {
 	PS.timerStart(2, G.tick);
 	PS.audioLoad("fx_jump3");
 	PS.audioLoad("fx_shoot7");
+	// PS.audioLoad("launch", { fileTypes: ["wav"], path: "audio/launch.wav" });
+	// PS.audioLoad("explode", { fileTypes: ["wav"], path: "audio/explode.wav" });
 };
 
 /*

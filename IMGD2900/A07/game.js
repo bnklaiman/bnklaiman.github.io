@@ -191,9 +191,9 @@ PS.init = function(system, options) {
 	PS.statusText("Touch any bead.");
 	PS.border(PS.ALL, PS.ALL, 1);
 	PS.borderColor(PS.ALL, PS.ALL, 0x111111);
-	PS.fade(PS.ALL, PS.ALL, 10);
 	PS.gridColor(G.GRID_COLOR);
 	PS.color(PS.ALL, PS.ALL, G.GRID_COLOR);
+	PS.fade(PS.ALL, PS.ALL, 10);
 	PS.timerStart(2, G.tick);
 	PS.audioLoad("fx_jump3");
 	PS.audioLoad("fx_shoot7");

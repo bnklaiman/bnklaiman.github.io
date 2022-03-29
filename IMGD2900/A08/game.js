@@ -145,8 +145,8 @@ var G = {
 
 	// cause firework explosion from (x,y) location
 	explode: function(x, y) {
-		PS.audioPlay("fx_shoot7", { volume: 1.0 });
-		
+		PS.audioPlay("explode", { fileTypes: ["wav"], path: "audio/"})
+
 		// explosion effect
 		// don't draw specific beads if outside border dimensions
 		if (PS.elapsed() % 3 === 0) {
@@ -308,7 +308,7 @@ PS.touch = function(x, y, data, options) {
 		// Position clicked is below boundary line, start ascent upwards from position clicked
 		G.activeFireworks.push({xPos: x, yPos: y});
 		PS.color(x, y, G.FIREWORK_UPWARD_COLOR);
-		PS.audioPlay("fx_jump3", { volume: 0.3 });
+		PS.audioPlay("launch", { fileTypes: ["wav"], path: "audio/", volume: 0.3 })
 		PS.statusText("Touch any bead.")
 	} else {
 		// if boundary line or higher clicked, explode on boundary line at x position immediately

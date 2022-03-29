@@ -289,8 +289,8 @@ PS.init = function(system, options) {
 	PS.color(PS.ALL, PS.ALL, G.GRID_COLOR);
 	PS.fade(PS.ALL, PS.ALL, 10);
 	PS.timerStart(2, G.tick);
-	PS.audioPlay("launch", { fileTypes: ["wav"], path: "audio/" })
-	PS.audioPlay("explode", { fileTypes: ["wav"], path: "audio/" })
+	PS.audioLoad("launch", { fileTypes: ["wav"], path: "audio/" })
+	PS.audioLoad("explode", { fileTypes: ["wav"], path: "audio/" })
 };
 
 /*

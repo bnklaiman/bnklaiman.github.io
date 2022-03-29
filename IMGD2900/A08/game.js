@@ -284,7 +284,7 @@ PS.init = function(system, options) {
 	PS.statusColor(G.STATUS_COLOR);
 	PS.statusText("Touch any bead.");
 	PS.border(PS.ALL, PS.ALL, 1);
-	PS.borderColor(PS.ALL, PS.ALL, 0x111111);
+	PS.borderColor(PS.ALL, PS.ALL, 0x171717);
 	PS.gridColor(G.GRID_COLOR);
 	PS.color(PS.ALL, PS.ALL, G.GRID_COLOR);
 	PS.fade(PS.ALL, PS.ALL, 10);

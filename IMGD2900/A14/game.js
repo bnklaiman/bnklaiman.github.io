@@ -208,7 +208,7 @@ var LEVELS = [
 const BACKGROUND_COLOR = 0x202126;
 const WATER_COLOR = 0x4285F4
 
-var currentLevel = 2;
+var currentLevel = 0;
 var currentWaterPathPosition = 0; // position (index) tracker in waterPath
 var waterPathLength = 0; // make separate counter to ignore branching path characters
 var currentWaterXPosition = 0;

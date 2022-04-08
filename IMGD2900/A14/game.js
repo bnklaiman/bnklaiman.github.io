@@ -108,9 +108,9 @@ var LEVELS = [
 			},
 			{
 				// color of gate and respective button
-				"color": 0xFF0000,
+				"color": 0x00FF00,
 				// x-position of gate
-				"gateX": 4,
+				"gateX": 7,
 				// y-position of gate
 				"gateY": 1,
 				// x-position of button
@@ -131,17 +131,90 @@ var LEVELS = [
 		// path of water, each character is one step on the grid
 		// '[' marks the beginning of a fork, ']' marks the end
 		"waterPath": ">>>>>>>>"
+	},
+	{
+		// grid dimensions
+		"gridSize": {
+			"width": 15,
+			"height": 15
+		},
+		// status text to be displayed:
+		"statusText": "Don't get flooded!",
+		// height of button area (bottom half)
+		"buttonAreaHeight": 7,
+		// all gates that can be controlled
+		"gates": [
+			{
+				// color of gate and respective button
+				"color": 0xFF0000,
+				// x-position of gate
+				"gateX": 7,
+				// y-position of gate
+				"gateY": 1,
+				// x-position of button
+				"buttonX": 3,
+				// y-position of button
+				"buttonY": 11,
+				// index of other affected gates that this gate's button controls
+				"otherAffectedGates": [2],
+				// is gate active? It's getting defined here, so for now yes.
+				"isActive": true
+			},
+			{
+				// color of gate and respective button
+				"color": 0x00FF00,
+				// x-position of gate
+				"gateX": 7,
+				// y-position of gate
+				"gateY": 3,
+				// x-position of button
+				"buttonX": 7,
+				// y-position of button
+				"buttonY": 11,
+				// index of other affected gates that this gate's button controls
+				"otherAffectedGates": [1],
+				// is gate active? It's getting defined here, so for now yes.
+				"isActive": true
+			},
+			{
+				// red => green
+				// color of gate and respective button
+				"color": 0xFFFF00,
+				// x-position of gate
+				"gateX": 7,
+				// y-position of gate
+				"gateY": 6,
+				// x-position of button
+				"buttonX": 11,
+				// y-position of button
+				"buttonY": 11,
+				// index of other affected gates that this gate's button controls
+				"otherAffectedGates": [0],
+				// is gate active? It's getting defined here, so for now yes.
+				"isActive": true
+			},
+		],
+		// define where the water starts
+		"waterPathStartingPoint": {
+			"x": 1,
+			"y": 1
+		},
+		// path of water, each character is one step on the grid
+		// '[' marks the beginning of a fork, ']' marks the end
+		"waterPath": ">>>>>>>>>>>>vv<<<<<<<<<<<<vv>>>>>>[vvv]>>>>>>"
 	}
 ];
 
-const BACKGROUND_COLOR = 0x101116;
+const BACKGROUND_COLOR = 0x202126;
+const WATER_COLOR = 0x4285F4
 
-var currentLevel = 0;
+var currentLevel = 2;
 var currentWaterPathPosition = 0; // position (index) tracker in waterPath
 var waterPathLength = 0; // make separate counter to ignore branching path characters
 var currentWaterXPosition = 0;
 var currentWaterYPosition = 0;
-var isLevelComplete = false; // is current level complete
+var isLevelComplete = false; // is current level complete?
+var onBranchingPath = false; // is the water currently on a branching path?
 
 /*
 PS.init(system, options)
@@ -161,7 +234,7 @@ function loadLevel(level) {
 	PS.statusText(level.statusText);
 	PS.color(PS.ALL, PS.ALL, 0x000000);
 	PS.bgAlpha(PS.ALL, PS.ALL, 255);
-	PS.bgColor(PS.ALL, PS.ALL, BACKGROUND_COLOR)
+	PS.bgColor(PS.ALL, PS.ALL, BACKGROUND_COLOR);
 	PS.radius(PS.ALL, PS.ALL, 0);
 	PS.border(PS.ALL, PS.ALL, 0);
 	// Fill in button area.
@@ -170,25 +243,58 @@ function loadLevel(level) {
 	var initialPathX = level.waterPathStartingPoint.x;
 	var initialPathY = level.waterPathStartingPoint.y;
 	PS.color(initialPathX, initialPathY, BACKGROUND_COLOR);
+	var tempPathX = 0;
+	var tempPathY = 0;
+	var isTempPath = false;
 	for (let i = 0; i < level.waterPath.length; i++) {
 		switch (level.waterPath[i]) {
+			case "[":
+				// start temporary branching path
+				isTempPath = true;
+				tempPathX = initialPathX;
+				tempPathY = initialPathY;
+				break;
+			case "]":
+				// end temporary branching path
+				isTempPath = false;
+				break;
 			case "<":
-				initialPathX--;
+				if (!isTempPath) {
+					initialPathX--;
+				} else {
+					tempPathX--;
+				}
 				break;
 			case "^":
-				initialPathY++;
+				if (!isTempPath) {
+					initialPathY--;
+				} else {
+					tempPathY--;
+				}
 				break;
 			case "v":
-				initialPathY--;
+				if (!isTempPath) {
+					initialPathY++;
+				} else {
+					tempPathY++;
+				}
 				break;
 			case ">":
-				initialPathX++;
+				if (!isTempPath) {
+					initialPathX++;
+				} else {
+					tempPathX++;
+				}
 				break;
 			default:
 				PS.debug("Uh oh! Invalid direction.\n");
 				break;
 		}
-		PS.color(initialPathX, initialPathY, BACKGROUND_COLOR);
+		if (!isTempPath) {
+			PS.color(initialPathX, initialPathY, BACKGROUND_COLOR);
+		} else {
+			PS.color(tempPathX, tempPathY, BACKGROUND_COLOR);
+		}
 	}
 
 	// Place gates and buttons.
@@ -208,7 +314,7 @@ function loadLevel(level) {
 	// Make water start at the beginning
 	currentWaterPathPosition = 0;
 	// Set water path length, ignore branching path characters
-	waterPathLength = 1;
+	waterPathLength = 0; // *BM* Was initialized to 1!
 	for (var i = 0; i < level.waterPath.length; i++) {
 		if (level.waterPath[i] !== '[' || level.waterPath[i] !== ']') {
 			waterPathLength += 1;
@@ -217,55 +323,131 @@ function loadLevel(level) {
 	// Initialize water starting point
 	currentWaterXPosition = level.waterPathStartingPoint.x;
 	currentWaterYPosition = level.waterPathStartingPoint.y;
+	isLevelComplete = false; // *BM* This allows the timer to begin or resume running
+	onBranchingPath = false;
 }
 
 // Every tick, unless a gate is up, make water flow.
 function tick() {
-	if (currentWaterPathPosition < waterPathLength) {
-		PS.color(currentWaterXPosition, currentWaterYPosition, 0x4285F4);
+
+	// *BM* Changed so that the timer code ONLY runs while the level is incomplete
+
+	if (!isLevelComplete) {
+		// *BM* These two lines were moved ABOVE the condition check
+		// Otherwise the final water path bead will not be filled!
+
+		PS.color(currentWaterXPosition, currentWaterYPosition, WATER_COLOR);
 		PS.data(currentWaterXPosition, currentWaterYPosition, "water");
-		switch (LEVELS[currentLevel].waterPath[currentWaterPathPosition]) {
-			case '<':
-				if (PS.data(currentWaterXPosition - 1, currentWaterYPosition) !== "gate") {
-					currentWaterXPosition -= 1;
+
+		if (currentWaterPathPosition < waterPathLength) {
+			switch (LEVELS[currentLevel].waterPath[currentWaterPathPosition]) {
+				case '<':
+					if (PS.data(currentWaterXPosition - 1, currentWaterYPosition) !== "gate") {
+						currentWaterXPosition -= 1;
+						currentWaterPathPosition++;
+					}
+					break;
+				case '^':
+					if (PS.data(currentWaterXPosition, currentWaterYPosition - 1) !== "gate") {
+						currentWaterYPosition -= 1;
+						currentWaterPathPosition++;
+					}
+					break;
+				case 'v':
+					if (PS.data(currentWaterXPosition, currentWaterYPosition + 1) !== "gate") {
+						currentWaterYPosition += 1;
+						currentWaterPathPosition++;
+					}
+					break;
+				case '>':
+					if (PS.data(currentWaterXPosition + 1, currentWaterYPosition) !== "gate") {
+						currentWaterXPosition += 1;
+						currentWaterPathPosition++;
+					}
+					break;
+				case '[':
+					// check if path ahead is clear, if not, go onto branching path
+					var isPathClear = true;
+
+					switch (LEVELS[currentLevel].waterPath[currentWaterPathPosition + 1]) {
+						case "<":
+							if (PS.data(currentWaterXPosition - 1, currentWaterYPosition) === "gate") {
+								isPathClear = false;
+							}
+							break;
+						case "^":
+							if (PS.data(currentWaterXPosition, currentWaterYPosition - 1) === "gate") {
+								isPathClear = false;
+							}
+							break;
+						case "v":
+							if (PS.data(currentWaterXPosition, currentWaterYPosition + 1) === "gate") {
+								isPathClear = false;
+							}
+							break;
+						case ">":
+							if (PS.data(currentWaterXPosition + 1, currentWaterYPosition) === "gate") {
+								isPathClear = false;
+							}
+							break;
+					}
+
+					// if gate is active in desired direction, go on branching path 
+					if (isPathClear) {
+						onBranchingPath = true;
+						switch (LEVELS[currentLevel].waterPath[currentWaterPathPosition + 1]) {
+							case "<":
+								if (PS.data(currentWaterXPosition - 1, currentWaterYPosition) !== "gate") {
+									PS.color(currentWaterXPosition - 1, currentWaterYPosition, WATER_COLOR);
+								}
+								break;
+							case "^":
+								if (PS.data(currentWaterXPosition, currentWaterYPosition - 1) !== "gate") {
+									PS.color(currentWaterXPosition, currentWaterYPosition - 1, WATER_COLOR);
+								}
+								break;
+							case "v":
+								if (PS.data(currentWaterXPosition, currentWaterYPosition + 1) !== "gate") {
+									PS.color(currentWaterXPosition, currentWaterYPosition + 1, WATER_COLOR);
+								}
+								break;
+							case ">":
+								if (PS.data(currentWaterXPosition + 1, currentWaterYPosition) !== "gate") {
+									PS.color(currentWaterXPosition + 1, currentWaterYPosition, WATER_COLOR);
+								}
+								break;
+						}
+					} else {
+						currentWaterPathPosition = LEVELS[currentLevel].waterPath.indexOf(']');
+					}
 					currentWaterPathPosition++;
-				}
-				break;
-			case '^':
-				if (PS.data(currentWaterXPosition, currentWaterYPosition - 1) !== "gate") {
-					currentWaterYPosition -= 1;
-					currentWaterPathPosition++;
-				}
-				break;
-			case 'v':
-				if (PS.data(currentWaterXPosition, currentWaterYPosition + 1) !== "gate") {
-					currentWaterYPosition += 1;
-					currentWaterPathPosition++;
-				}
-				break;
-			case '>':
-				if (PS.data(currentWaterXPosition + 1, currentWaterYPosition) !== "gate") {
-					currentWaterXPosition += 1;
-					currentWaterPathPosition++;
-				}
-				break;
+					break;
+				case "]":
+					onBranchingPath = false;
+					currentWaterPathPosition;
+					break;
+			}
 		}
-	} else {
-		isLevelComplete = true;
-	}
-	
-	if (isLevelComplete) {
-		// Puzzle complete!
-		PS.statusText("Level Complete!");
-		PS.audioPlay("fx_tada");
+		else {
+			isLevelComplete = true; // *BM* This temporarily halts the timer
+			if (currentLevel < LEVELS.length - 1) {
+				PS.statusText("Level Complete!");
+			} else {
+				PS.statusText("Game complete! Congratulations!");
+			}
+			PS.audioPlay("fx_drip1");
+			PS.color(LEVELS[currentLevel].gridSize.width - 2, LEVELS[currentLevel].gridSize.height - 2, 0x007700);
+			PS.glyphColor(LEVELS[currentLevel].gridSize.width - 2, LEVELS[currentLevel].gridSize.height - 2, 0xFFFFFF);
+			PS.glyph(LEVELS[currentLevel].gridSize.width - 2, LEVELS[currentLevel].gridSize.height - 2, 0x21D2);
+		}
 	}
 }
 
 PS.init = function(system, options) {
-	PS.timerStart(7, tick)
 	PS.audioLoad("fx_scratch");
-	PS.audioLoad("fx_tada");
+	PS.audioLoad("fx_drip1");
 	loadLevel(LEVELS[currentLevel]);
+	PS.timerStart(7, tick); // *BM* Start timer AFTER first level load!
 };
 
 /*
@@ -281,30 +463,44 @@ This function doesn't have to do anything. Any value returned is ignored.
 PS.touch = function(x, y, data, options) {
 	var gates = LEVELS[currentLevel].gates;
 
-	// If reset button is clicked, reset puzzle
+	// If reset button is clicked and puzzle is not complete, reset puzzle
 	if (x === LEVELS[currentLevel].gridSize.width - 2 && y === LEVELS[currentLevel].gridSize.height - 2) {
-		PS.audioPlay("fx_scratch", { volume: 0.5 });
-		gates.forEach(gate => {
-			if (!gate.isActive) {
-				gate.isActive = true;
+		if (!isLevelComplete) {
+			PS.audioPlay("fx_scratch", { volume: 0.3 });
+			gates.forEach(gate => {
+				if (!gate.isActive) {
+					gate.isActive = true;
+				}
+			});
+		} else {
+			if (currentLevel + 1 >= LEVELS.length) {
+				currentLevel = 0;
+			} else {
+				currentLevel += 1;
 			}
-		});
-		loadLevel(LEVELS[currentLevel]);
+		}
 	}
+	loadLevel(LEVELS[currentLevel]);
 
 	// If button is clicked, affect gates
 	gates.forEach(gate => {
 		if (x === gate.buttonX && y === gate.buttonY && gate.isActive) {
+			PS.audioPlay("fx_blip");
 			PS.data(gate.gateX, gate.gateY, null);
 			PS.color(gate.gateX, gate.gateY, BACKGROUND_COLOR);
 			PS.color(gate.buttonX, gate.buttonY, BACKGROUND_COLOR);
 			gate.isActive = false;
+			for (var i = 0; i < gate.otherAffectedGates.length; i++) {
+				PS.data(gates[i].gateX, gates[i].gateY, null);
+				PS.color(gates[i].gateX, gates[i].gateY, BACKGROUND_COLOR);
+				gates[i].isActive = false;
+			};
 		}
 	});
 };
 
 /*
-PS.release ( x, y, data, options )
+PS.release (x, y, data, options)
 Called when the left mouse button is released, or when a touch is lifted, over bead(x, y).
 This function doesn't have to do anything. Any value returned is ignored.
 [x : Number] = zero-based x-position (column) of the bead on the grid.
@@ -313,16 +509,16 @@ This function doesn't have to do anything. Any value returned is ignored.
 [options : Object] = A JavaScript object with optional data properties; see API documentation for details.
 */
 
-PS.release = function( x, y, data, options ) {
+PS.release = function(x, y, data, options) {
 	// Uncomment the following code line to inspect x/y parameters:
 
-	// PS.debug( "PS.release() @ " + x + ", " + y + "\n" );
+	// PS.debug("PS.release() @ " + x + ", " + y + "\n");
 
 	// Add code here for when the mouse button/touch is released over a bead.
 };
 
 /*
-PS.enter ( x, y, button, data, options )
+PS.enter (x, y, button, data, options)
 Called when the mouse cursor/touch enters bead(x, y).
 This function doesn't have to do anything. Any value returned is ignored.
 [x : Number] = zero-based x-position (column) of the bead on the grid.
@@ -331,16 +527,22 @@ This function doesn't have to do anything. Any value returned is ignored.
 [options : Object] = A JavaScript object with optional data properties; see API documentation for details.
 */
 
-PS.enter = function( x, y, data, options ) {
+PS.enter = function(x, y, data, options) {
 	if (x === LEVELS[currentLevel].gridSize.width - 2 && y === LEVELS[currentLevel].gridSize.height - 2) {
-		PS.statusText("Reset water stream");
-	} else {
+		if (!isLevelComplete) {
+			PS.statusText("Reset water stream");
+		} else {
+			PS.statusText("Go to next level =>");
+		}
+	} else if (!isLevelComplete) { // *BM* Prevents message from appearing until AFTER level start
 		PS.statusText(LEVELS[currentLevel].statusText);
+	} else {
+		PS.statusText(""); // *BM* Clears reset prompt when not over reset button
 	}
 };
 
 /*
-PS.exit ( x, y, data, options )
+PS.exit (x, y, data, options)
 Called when the mouse cursor/touch exits bead(x, y).
 This function doesn't have to do anything. Any value returned is ignored.
 [x : Number] = zero-based x-position (column) of the bead on the grid.
@@ -349,31 +551,31 @@ This function doesn't have to do anything. Any value returned is ignored.
 [options : Object] = A JavaScript object with optional data properties; see API documentation for details.
 */
 
-PS.exit = function( x, y, data, options ) {
+PS.exit = function(x, y, data, options) {
 	// Uncomment the following code line to inspect x/y parameters:
 
-	// PS.debug( "PS.exit() @ " + x + ", " + y + "\n" );
+	// PS.debug("PS.exit() @ " + x + ", " + y + "\n");
 
 	// Add code here for when the mouse cursor/touch exits a bead.
 };
 
 /*
-PS.exitGrid ( options )
+PS.exitGrid (options)
 Called when the mouse cursor/touch exits the grid perimeter.
 This function doesn't have to do anything. Any value returned is ignored.
 [options : Object] = A JavaScript object with optional data properties; see API documentation for details.
 */
 
-PS.exitGrid = function( options ) {
+PS.exitGrid = function(options) {
 	// Uncomment the following code line to verify operation:
 
-	// PS.debug( "PS.exitGrid() called\n" );
+	// PS.debug("PS.exitGrid() called\n");
 
 	// Add code here for when the mouse cursor/touch moves off the grid.
 };
 
 /*
-PS.keyDown ( key, shift, ctrl, options )
+PS.keyDown (key, shift, ctrl, options)
 Called when a key on the keyboard is pressed.
 This function doesn't have to do anything. Any value returned is ignored.
 [key : Number] = ASCII code of the released key, or one of the PS.KEY_* constants documented in the API.
@@ -382,16 +584,16 @@ This function doesn't have to do anything. Any value returned is ignored.
 [options : Object] = A JavaScript object with optional data properties; see API documentation for details.
 */
 
-PS.keyDown = function( key, shift, ctrl, options ) {
+PS.keyDown = function(key, shift, ctrl, options) {
 	// Uncomment the following code line to inspect first three parameters:
 
-	// PS.debug( "PS.keyDown(): key=" + key + ", shift=" + shift + ", ctrl=" + ctrl + "\n" );
+	// PS.debug("PS.keyDown(): key=" + key + ", shift=" + shift + ", ctrl=" + ctrl + "\n");
 
 	// Add code here for when a key is pressed.
 };
 
 /*
-PS.keyUp ( key, shift, ctrl, options )
+PS.keyUp (key, shift, ctrl, options)
 Called when a key on the keyboard is released.
 This function doesn't have to do anything. Any value returned is ignored.
 [key : Number] = ASCII code of the released key, or one of the PS.KEY_* constants documented in the API.
@@ -400,16 +602,16 @@ This function doesn't have to do anything. Any value returned is ignored.
 [options : Object] = A JavaScript object with optional data properties; see API documentation for details.
 */
 
-PS.keyUp = function( key, shift, ctrl, options ) {
+PS.keyUp = function(key, shift, ctrl, options) {
 	// Uncomment the following code line to inspect first three parameters:
 
-	// PS.debug( "PS.keyUp(): key=" + key + ", shift=" + shift + ", ctrl=" + ctrl + "\n" );
+	// PS.debug("PS.keyUp(): key=" + key + ", shift=" + shift + ", ctrl=" + ctrl + "\n");
 
 	// Add code here for when a key is released.
 };
 
 /*
-PS.input ( sensors, options )
+PS.input (sensors, options)
 Called when a supported input device event (other than those above) is detected.
 This function doesn't have to do anything. Any value returned is ignored.
 [sensors : Object] = A JavaScript object with properties indicating sensor status; see API documentation for details.
@@ -417,13 +619,13 @@ This function doesn't have to do anything. Any value returned is ignored.
 NOTE: Currently, only mouse wheel events are reported, and only when the mouse cursor is positioned directly over the grid.
 */
 
-PS.input = function( sensors, options ) {
+PS.input = function(sensors, options) {
 	// Uncomment the following code lines to inspect first parameter:
 
 //	 var device = sensors.wheel; // check for scroll wheel
 //
-//	 if ( device ) {
-//	   PS.debug( "PS.input(): " + device + "\n" );
+//	 if (device) {
+//	   PS.debug("PS.input(): " + device + "\n");
 //	 }
 
 	// Add code here for when an input event is detected.

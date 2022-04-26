@@ -192,7 +192,7 @@ var G = (function() {
 		
 		loadLevel: function(level) {
 			G.timerID = PS.timerStart(15, G.tick);
-			PS.statusText("Play it back!");
+			PS.statusText("Play it back, with the WASD or arrow keys");
 			G.isPuzzleComplete = false;
 			G.timeElapsed = 0;
 

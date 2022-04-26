@@ -442,7 +442,7 @@ PS.init = function(system, options) {
 	PS.audioLoad("piano_g4", { volume: 0.25 });
 	PS.audioLoad("fx_jump1", { volume: 0.3 });
 	PS.audioLoad("fx_bloink", { volume: 0.3 });
-	PS.audioLoad("fx_blast1", { volume: 0.4 });
+	PS.audioLoad("fx_blast1", { volume: 0.3 });
 	PS.gridSize(16, 16);
 	PS.gridColor(0x333333);
 	PS.statusColor(0xFFFFFF);

@@ -98,7 +98,81 @@ var G = (function() {
 				pattern: "22_2_12_3",
 				patternLength: 6,
 				timerInterval: 30
-			}
+			},
+			{
+				layout: [
+					{
+						note: 0,
+						sound: "hchord_g4",
+						pre_sound: "piano_g3"
+					},
+					{
+						note: 1,
+						sound: "hchord_a4",
+						pre_sound: "piano_a3"
+					},
+					{
+						note: 2,
+						sound: "hchord_b4",
+						pre_sound: "piano_b3"
+					},
+					{
+						note: 3,
+						sound: "hchord_c5",
+						pre_sound: "piano_c4"
+					}
+				],
+				pattern: "31_32_32_0",
+				patternLength: 7,
+				timerInterval: 30
+			},
+			/*{
+				layout: [
+					{
+						note: 0,
+						sound: "hchord_db5",
+						pre_sound: "piano_db4"
+					},
+					{
+						note: 1,
+						sound: "hchord_eb5",
+						pre_sound: "piano_eb4"
+					},
+					{
+						note: 2,
+						sound: "hchord_e5",
+						pre_sound: "piano_e4"
+					},
+					{
+						note: 3,
+						sound: "hchord_gb5",
+						pre_sound: "piano_gb4"
+					},
+					{
+						note: 4,
+						sound: "hchord_ab5",
+						pre_sound: "piano_ab4"
+					},
+					{
+						note: 5,
+						sound: "hchord_bb5",
+						pre_sound: "piano_bb4"
+					},
+					{
+						note: 6,
+						sound: "hchord_b5",
+						pre_sound: "piano_b4"
+					},
+					{
+						note: 7,
+						sound: "hchord_db6",
+						pre_sound: "piano_db5"
+					}
+				],
+				pattern: "01234_7_6_4_5",
+				patternLength: 9,
+				timerInterval: 30
+			},*/
 		],
 
 		currentLevel: 0,
@@ -111,11 +185,15 @@ var G = (function() {
 
 		currentUserInput: "",
 		isGameOver: false,
+		isPuzzleComplete: false,
 		isPlayingBackPreview: false,
 		currentPreviewNote: 0,
 		currentSide: "left", // define which side is taking input from WASD/arrow keys
 		
 		loadLevel: function(level) {
+			G.timerID = PS.timerStart(15, G.tick);
+			PS.statusText("Play it back!");
+			G.isPuzzleComplete = false;
 			G.timeElapsed = 0;
 
 			// fill in BG beads
@@ -145,6 +223,7 @@ var G = (function() {
 		playPreviewNote: function() {
 			switch (G.LEVELS[G.currentLevel].pattern[G.currentPreviewNote]) {
 				case "0":
+					G.currentSide = "left";
 					PS.audioPlay(G.LEVELS[G.currentLevel].layout[0].pre_sound);
 					if (G.currentPreviewNote < 8) {
 						PS.color(G.currentPreviewNote + 4, 4, G.BUTTON_COLORS[0]);
@@ -157,6 +236,7 @@ var G = (function() {
 					}
 					break;
 				case "1":
+					G.currentSide = "left";
 					PS.audioPlay(G.LEVELS[G.currentLevel].layout[1].pre_sound);
 					if (G.currentPreviewNote < 8) {
 						PS.color(G.currentPreviewNote + 4, 4, G.BUTTON_COLORS[1]);
@@ -169,6 +249,7 @@ var G = (function() {
 					}
 					break;
 				case "2":
+					G.currentSide = "left";
 					PS.audioPlay(G.LEVELS[G.currentLevel].layout[2].pre_sound);
 					if (G.currentPreviewNote < 8) {
 						PS.color(G.currentPreviewNote + 4, 4, G.BUTTON_COLORS[2]);
@@ -181,6 +262,7 @@ var G = (function() {
 					}
 					break;
 				case "3":
+					G.currentSide = "left";
 					PS.audioPlay(G.LEVELS[G.currentLevel].layout[3].pre_sound);
 					if (G.currentPreviewNote < 8) {
 						PS.color(G.currentPreviewNote + 4, 4, G.BUTTON_COLORS[3]);
@@ -188,6 +270,58 @@ var G = (function() {
 						PS.radius(G.currentPreviewNote + 4, 4, 50);
 					} else {
 						PS.color((G.currentPreviewNote - 8) + 4, 6, G.BUTTON_COLORS[3]);
+						PS.bgColor((G.currentPreviewNote - 8) + 4, 6, G.MUSIC_AREA_COLOR);
+						PS.radius((G.currentPreviewNote - 8) + 4, 6, 50);
+					}
+					break;
+				case "4":
+					G.currentSide = "right";
+					PS.audioPlay(G.LEVELS[G.currentLevel].layout[4].pre_sound);
+					if (G.currentPreviewNote < 8) {
+						PS.color(G.currentPreviewNote + 4, 4, G.BUTTON_COLORS[4]);
+						PS.bgColor(G.currentPreviewNote + 4, 4, G.MUSIC_AREA_COLOR);
+						PS.radius(G.currentPreviewNote + 4, 4, 50);
+					} else {
+						PS.color((G.currentPreviewNote - 8) + 4, 6, G.BUTTON_COLORS[4]);
+						PS.bgColor((G.currentPreviewNote - 8) + 4, 6, G.MUSIC_AREA_COLOR);
+						PS.radius((G.currentPreviewNote - 8) + 4, 6, 50);
+					}
+					break;
+				case "5":
+					G.currentSide = "right";
+					PS.audioPlay(G.LEVELS[G.currentLevel].layout[5].pre_sound);
+					if (G.currentPreviewNote < 8) {
+						PS.color(G.currentPreviewNote + 4, 4, G.BUTTON_COLORS[5]);
+						PS.bgColor(G.currentPreviewNote + 4, 4, G.MUSIC_AREA_COLOR);
+						PS.radius(G.currentPreviewNote + 4, 4, 50);
+					} else {
+						PS.color((G.currentPreviewNote - 8) + 4, 6, G.BUTTON_COLORS[5]);
+						PS.bgColor((G.currentPreviewNote - 8) + 4, 6, G.MUSIC_AREA_COLOR);
+						PS.radius((G.currentPreviewNote - 8) + 4, 6, 50);
+					}
+					break;
+				case "6":
+					G.currentSide = "right";
+					PS.audioPlay(G.LEVELS[G.currentLevel].layout[6].pre_sound);
+					if (G.currentPreviewNote < 8) {
+						PS.color(G.currentPreviewNote + 4, 4, G.BUTTON_COLORS[6]);
+						PS.bgColor(G.currentPreviewNote + 4, 4, G.MUSIC_AREA_COLOR);
+						PS.radius(G.currentPreviewNote + 4, 4, 50);
+					} else {
+						PS.color((G.currentPreviewNote - 8) + 4, 6, G.BUTTON_COLORS[6]);
+						PS.bgColor((G.currentPreviewNote - 8) + 4, 6, G.MUSIC_AREA_COLOR);
+						PS.radius((G.currentPreviewNote - 8) + 4, 6, 50);
+					}
+					break;
+				case "7":
+					G.currentSide = "right";
+					PS.audioPlay(G.LEVELS[G.currentLevel].layout[7].pre_sound);
+					if (G.currentPreviewNote < 8) {
+						PS.color(G.currentPreviewNote + 4, 4, G.BUTTON_COLORS[7]);
+						PS.bgColor(G.currentPreviewNote + 4, 4, G.MUSIC_AREA_COLOR);
+						PS.radius(G.currentPreviewNote + 4, 4, 50);
+					} else {
+						PS.color((G.currentPreviewNote - 8) + 4, 6, G.BUTTON_COLORS[7]);
 						PS.bgColor((G.currentPreviewNote - 8) + 4, 6, G.MUSIC_AREA_COLOR);
 						PS.radius((G.currentPreviewNote - 8) + 4, 6, 50);
 					}
@@ -210,7 +344,15 @@ var G = (function() {
 					PS.color(G.BUTTON_BEAD_POSITIONS[i][0][0], G.BUTTON_BEAD_POSITIONS[i][0][1], G.BUTTON_COLORS[i]);
 					PS.color(G.BUTTON_BEAD_POSITIONS[i][1][0], G.BUTTON_BEAD_POSITIONS[i][1][1], G.BUTTON_COLORS[i]);
 				}
+				for (var i = 4; i < 8; i++) {
+					PS.color(G.BUTTON_BEAD_POSITIONS[i][0][0], G.BUTTON_BEAD_POSITIONS[i][0][1], G.MUSIC_AREA_COLOR);
+					PS.color(G.BUTTON_BEAD_POSITIONS[i][1][0], G.BUTTON_BEAD_POSITIONS[i][1][1], G.MUSIC_AREA_COLOR);
+				}
 			} else if (G.currentSide === "right") {
+				for (var i = 0; i < 4; i++) {
+					PS.color(G.BUTTON_BEAD_POSITIONS[i][0][0], G.BUTTON_BEAD_POSITIONS[i][0][1], G.MUSIC_AREA_COLOR);
+					PS.color(G.BUTTON_BEAD_POSITIONS[i][1][0], G.BUTTON_BEAD_POSITIONS[i][1][1], G.MUSIC_AREA_COLOR);
+				}
 				for (var i = 4; i < 8; i++) {
 					PS.color(G.BUTTON_BEAD_POSITIONS[i][0][0], G.BUTTON_BEAD_POSITIONS[i][0][1], G.BUTTON_COLORS[i]);
 					PS.color(G.BUTTON_BEAD_POSITIONS[i][1][0], G.BUTTON_BEAD_POSITIONS[i][1][1], G.BUTTON_COLORS[i]);
@@ -240,8 +382,13 @@ var G = (function() {
 			// temporarily erase rest periods for easier checking
 			if (G.currentUserInput === G.LEVELS[G.currentLevel].pattern.split("_").join("")) {
 				PS.timerStop(G.timerID);
-				PS.statusText("Correct!");
 				PS.audioPlay("fx_jump1");
+				G.isPuzzleComplete = true;
+				if (G.currentLevel < G.LEVELS.length - 1) {
+					PS.statusText("Correct! Press [SPACE] to continue.");
+				} else {
+					PS.statusText("Congratulations! Game complete!");
+				}
 			} else {
 				PS.statusText("Not quite! Try again.");
 				PS.audioPlay("fx_bloink");
@@ -266,12 +413,31 @@ Any value returned is ignored.
 */
 
 PS.init = function(system, options) {
+	PS.audioLoad("hchord_e4", { volume: 0.25 });
+	PS.audioLoad("hchord_f4", { volume: 0.25 });
 	PS.audioLoad("hchord_g4", { volume: 0.25 });
+	PS.audioLoad("hchord_a4", { volume: 0.25 });
+	PS.audioLoad("hchord_b4", { volume: 0.25 });
 	PS.audioLoad("hchord_c5", { volume: 0.25 });
+	PS.audioLoad("hchord_d5", { volume: 0.25 });
 	PS.audioLoad("hchord_e5", { volume: 0.25 });
 	PS.audioLoad("hchord_g5", { volume: 0.25 });
+	PS.audioLoad("hchord_b5", { volume: 0.25 });
+
+	PS.audioLoad("hchord_db5", { volume: 0.25 });
+	PS.audioLoad("hchord_eb5", { volume: 0.25 });
+	PS.audioLoad("hchord_gb5", { volume: 0.25 });
+	PS.audioLoad("hchord_ab5", { volume: 0.25 });
+	PS.audioLoad("hchord_bb5", { volume: 0.25 });
+	PS.audioLoad("hchord_db6", { volume: 0.25 });
+	
+	PS.audioLoad("piano_e3", { volume: 0.25 });
+	PS.audioLoad("piano_f3", { volume: 0.25 });
 	PS.audioLoad("piano_g3", { volume: 0.25 });
+	PS.audioLoad("piano_a3", { volume: 0.25 });
+	PS.audioLoad("piano_b3", { volume: 0.25 });
 	PS.audioLoad("piano_c4", { volume: 0.25 });
+	PS.audioLoad("piano_d4", { volume: 0.25 });
 	PS.audioLoad("piano_e4", { volume: 0.25 });
 	PS.audioLoad("piano_g4", { volume: 0.25 });
 	PS.audioLoad("fx_jump1", { volume: 0.3 });
@@ -280,9 +446,7 @@ PS.init = function(system, options) {
 	PS.gridSize(16, 16);
 	PS.gridColor(0x333333);
 	PS.statusColor(0xFFFFFF);
-	PS.statusText("Play it back!");
 	G.loadLevel(G.currentLevel);
-	G.timerID = PS.timerStart(15, G.tick);
 };
 
 /*
@@ -314,22 +478,35 @@ PS.keyDown = function(key, shift, ctrl, options) {
 			}
 		} else if (G.currentSide === "right") {
 			if (key === G.BUTTON_KEYCODES[0] || key === G.BUTTON_KEYCODES[4]) {
-				PS.audioPlay(G.LEVELS[G.currentLevel].layout[0].sound);
+				PS.audioPlay(G.LEVELS[G.currentLevel].layout[4].sound);
 				G.currentUserInput += "4";
 			} else if (key === G.BUTTON_KEYCODES[1] || key === G.BUTTON_KEYCODES[5]) {
-				PS.audioPlay(G.LEVELS[G.currentLevel].layout[1].sound);
+				PS.audioPlay(G.LEVELS[G.currentLevel].layout[5].sound);
 				G.currentUserInput += "5";
 			} else if (key === G.BUTTON_KEYCODES[2] || key === G.BUTTON_KEYCODES[6]) {
-				PS.audioPlay(G.LEVELS[G.currentLevel].layout[2].sound);
+				PS.audioPlay(G.LEVELS[G.currentLevel].layout[6].sound);
 				G.currentUserInput += "6";
 			} else if (key === G.BUTTON_KEYCODES[3] || key === G.BUTTON_KEYCODES[7]) {
-				PS.audioPlay(G.LEVELS[G.currentLevel].layout[3].sound);
+				PS.audioPlay(G.LEVELS[G.currentLevel].layout[7].sound);
 				G.currentUserInput += "7";
 			}
 		}
 	}
 
+	if (G.currentUserInput.length < G.LEVELS[G.currentLevel].patternLength - 1) {
+		if (G.LEVELS[G.currentLevel].pattern.split("_").join("").charAt(G.currentUserInput.length - 1) >= 0 || G.LEVELS[G.currentLevel].pattern.split("_").join("").charAt(G.currentUserInput.length - 1) < 4) {
+			G.currentSide = "left";
+		} else if (G.LEVELS[G.currentLevel].pattern.split("_").join("").charAt(G.currentUserInput.length - 1) >= 4 || G.LEVELS[G.currentLevel].pattern.split("_").join("").charAt(G.currentUserInput.length - 1) < 8) {
+			G.currentSide = "right";
+		}
+	}
+
 	if (G.currentUserInput.length >= G.LEVELS[G.currentLevel].patternLength) {
 		G.validateInput();
+	}
+
+	if (key === PS.KEY_SPACE && (G.currentLevel < G.LEVELS.length - 1)) {
+		G.currentLevel++;
+		G.loadLevel(G.currentLevel);
 	}
 };

@@ -406,7 +406,6 @@ var G = (function() {
 						// dynamic sound loader, wooo!
 						for (let i = 0; i < G.LEVELS[G.currentLevel + 1].layout.length; i++) {
 							PS.audioLoad(G.LEVELS[G.currentLevel + 1].layout[i].sound);
-							PS.debug("Loading " + G.LEVELS[G.currentLevel + 1].layout[i].sound + "\n")
 						}
 					}
 				}

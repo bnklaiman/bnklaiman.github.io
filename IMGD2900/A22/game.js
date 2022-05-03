@@ -414,7 +414,6 @@ var G = (function() {
 					PS.statusText("Correct! Press [SPACE] to continue.");
 				} else {
 					PS.statusText("Congratulations! Game complete!");
-					PS.timerStop(G.timerID);
 				}
 			} else {
 				PS.statusText("Not quite! Try again.");

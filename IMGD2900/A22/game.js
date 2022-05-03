@@ -402,6 +402,13 @@ var G = (function() {
 				// PS.timerStop(G.timerID);
 				if (!G.isPuzzleComplete) {
 					PS.audioPlay("fx_jump1");
+					if (G.currentLevel < G.LEVELS.length - 1) {
+						// dynamic sound loader, wooo!
+						for (let i = 0; i < G.LEVELS[G.currentLevel + 1].layout.length; i++) {
+							PS.audioLoad(G.LEVELS[G.currentLevel + 1].layout[i].sound);
+							PS.debug("Loading " + G.LEVELS[G.currentLevel + 1].layout[i].sound + "\n")
+						}
+					}
 				}
 				G.isPuzzleComplete = true;
 				if (G.currentLevel < G.LEVELS.length - 1) {
@@ -507,10 +514,6 @@ PS.keyDown = function(key, shift, ctrl, options) {
 	}
 
 	if (key === PS.KEY_SPACE && (G.currentLevel < G.LEVELS.length - 1) && G.isPuzzleComplete) {
-		// dynamic sound loader, wooo!
-		for (let i = 0; i < G.LEVELS[G.currentLevel + 1].layout.length; i++) {
-			PS.audioLoad(G.LEVELS[G.currentLevel + 1].layout[i].sound);
-		}
 		G.currentLevel++;
 		G.loadLevel(G.currentLevel);
 	} else if (key === PS.KEY_SPACE) {

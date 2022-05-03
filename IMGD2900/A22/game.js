@@ -168,7 +168,7 @@ var G = (function() {
 		loadLevel: function(level) {
 			G.currentUserInput = "";
 			G.previewNotePositions.length = 0;
-			// G.timerID = PS.timerStart(15, G.tick);
+			G.timerID = PS.timerStart(15, G.tick);
 			if (G.currentLevel === 4) {
 				PS.statusText("I wonder what that [SPACE] bar does...")
 			} else {
@@ -399,8 +399,8 @@ var G = (function() {
 			// temporarily erase rest periods for easier checking
 			let trimmedPattern = G.LEVELS[G.currentLevel].pattern.split("_").join("");
 			if (G.currentUserInput === trimmedPattern) {
-				// PS.timerStop(G.timerID);
 				if (!G.isPuzzleComplete) {
+					PS.timerStop(G.timerID);
 					PS.audioPlay("fx_jump1");
 					if (G.currentLevel < G.LEVELS.length - 1) {
 						// dynamic sound loader, wooo!
@@ -449,7 +449,6 @@ PS.init = function(system, options) {
 	PS.gridSize(16, 16);
 	PS.gridColor(0x333333);
 	PS.statusColor(0xFFFFFF);
-	G.timerID = PS.timerStart(15, G.tick);
 	G.loadLevel(G.currentLevel);
 };
 
